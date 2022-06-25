@@ -1,0 +1,68 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<div class="container">
+    <h1>Category: {{ category }}</h1>
+    <h3>Active Listings</h3>
+    <div class="row row-cols-1 row-cols-md-3 g-4 mb-3">
+        {% for auction in activeAuctions %}
+        <div class="col">
+            <div class="card h-100">
+                <img class="card-img-top" src="{{ auction.imageURL }}" alt="Card image cap">
+                <div class="card-body">
+                    <h3 class="card-text">{{ auction.title }}</h3>
+                    {% if auction.currentBid %}
+                    <h5 class="card-title">${{ auction.currentBid.amount }}</h5>
+                    {% else %}
+                    <h5 class="card-title">${{ auction.startingBid }}</h5>
+                    {% endif %}
+                    <p class="card-text">{{ auction.description }}</p>
+                    <a href="{% url 'auctions:auction' auction.pk %}" class="btn btn-primary">More details...</a>
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">Posted by: {{ auction.lister.username }}</small>
+                </div>
+            </div>
+        </div>
+
+        {% empty %}
+        <div class="col">
+            <div class="alert alert-danger" role="alert">
+                No active listings yet.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <h3>Closed Listings</h3>
+    <div class="row row-cols-1 row-cols-md-3 g-4 mb-3">
+        {% for auction in closedAuctions %}
+        <div class="col">
+            <div class="card h-100">
+                <img class="card-img-top" src="{{ auction.imageURL }}" alt="Card image cap">
+                <div class="card-body">
+                    <h3 class="card-text">{{ auction.title }}</h3>
+                    {% if auction.currentBid %}
+                    <h5 class="card-title">${{ auction.currentBid.amount }}</h5>
+                    {% else %}
+                    <h5 class="card-title">${{ auction.startingBid }}</h5>
+                    {% endif %}
+                    <p class="card-text">{{ auction.description }}</p>
+                    <a href="{% url 'auctions:auction' auction.pk %}" class="btn btn-primary">More details...</a>
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">Posted by: {{ auction.lister.username }}</small>
+                </div>
+            </div>
+        </div>
+
+        {% empty %}
+        <div class="col">
+            <div class="alert alert-danger" role="alert">
+                No closed listings yet.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

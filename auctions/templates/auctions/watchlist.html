@@ -1,0 +1,32 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<div class="container">
+    <h2>Listings on your Watchlist:</h2>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for WatchlistsEntry in WatchlistsEntries %}
+        <div class="col">
+            <div class="card h-100">
+                <img class="card-img-top" src="{{ WatchlistsEntry.auction.imageURL }}" alt="Card image cap">
+                <div class="card-body">
+                    <h3 class="card-text">{{ WatchlistsEntry.auction.title }}</h3>
+                    <h5 class="card-title">${{ WatchlistsEntry.auction.currentBid.amount }}</h5>
+                    <p class="card-text">{{ WatchlistsEntry.auction.description }}</p>
+                    <a href="{% url 'auctions:auction' WatchlistsEntry.auction.pk %}" class="btn btn-primary">More
+                        details...</a>
+                </div>
+                <div class="card-footer">
+                    <small class="text-muted">Posted by: {{ WatchlistsEntry.auction.lister.username }}</small>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col">
+            <div class="alert alert-danger" role="alert">
+                No listings yet.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

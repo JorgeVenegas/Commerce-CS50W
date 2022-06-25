@@ -1,0 +1,25 @@
+{% extends "auctions/layout.html" %}
+{% csrf_token %}
+{% block body %}
+<h2>Edit Listing</h2>
+
+<form action="{% url 'auctions:edit' auction.pk %}" method="post">
+    {% csrf_token %}
+    <div class="form-group mb-3">
+        {{ newListingForm.title }}
+    </div>
+    <div class="form-group mb-3">
+        {{ newListingForm.description }}
+    </div>
+    <div class="form-group mb-3">
+        {{ newListingForm.startingBid }}
+    </div>
+    <div class="form-group mb-3">
+        {{ newListingForm.imageURL }}
+    </div>
+    <div class="form-group mb-3">
+        {{ newListingForm.category }}
+    </div>
+    <input class="btn btn-primary" type="submit" value="Edit listing">
+</form>
+{% endblock %}

@@ -1,0 +1,162 @@
+{% extends "auctions/layout.html" %} {% block body %}
+<div class="container">
+    <div class="row">
+        {% if not auction.active %}
+        <div class="col-12">
+            <div class="alert alert-warning" role="alert">
+                <strong>Closed auction.</strong>
+                Sold for ${{ auction.currentBid.amount }} to {{ auction.winner.username }}
+            </div>
+        </div>
+        {% endif %}
+        <div class="col-12 col-md-6">
+            <h2>{{ auction.title }}</h2>
+        </div>
+
+        {% if user.is_authenticated %}
+        <div class="col-12 col-md-6 d-flex justify-content-end">
+            {% if permission %}
+
+            {% if auction.active %}
+            <form action="{% url 'auctions:edit' auction.pk %}">
+                <input type="submit" class="btn btn-outline-primary" value="Edit listing"></button>
+            </form>
+
+            {% if auction.currentBid %}
+            <form action="{% url 'auctions:close' auction.pk %}" method="post">
+                {% csrf_token %}
+                <input type="submit" class="btn btn-outline-primary" value="Close listing"></button>
+            </form>
+            {% endif %}
+            {% endif %}
+
+            {% else %}
+            {% if inWachlist %}
+            <form action="{% url 'auctions:edit_watchlist' 'remove' auction.pk  %}" method="post">
+                {% csrf_token %}
+                <input class="btn btn-danger" type="submit" value="Remove from watchlist">
+            </form>
+            {% else %}
+            <form action="{% url 'auctions:edit_watchlist' 'add' auction.pk  %}" method="post">
+                {% csrf_token %}
+                <input class="btn btn-primary" type="submit" value="Add to watchlist">
+            </form>
+            {% endif %}
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12 col-md-7 mb-3">
+            <img src="{{ auction.imageURL }}" class='img-fluid' alt="{{ auction.title }}" width="100%" />
+        </div>
+        <div class="col-sm-12 col-md-5 mb-3">
+            <h6>{{ auction.description }}</h6>
+            <h6>Details:</h6>
+            <ul>
+                <li>
+                    <p>Posted by: {{ auction.lister.username }}</p>
+                </li>
+                <li>
+                    <p>Category: {{ auction.category.title }}</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+    <div class="row mb-3">
+        <div class="col-sm-12 col-md-4">
+            <h5>Starting bid:</h5>
+            <h3> ${{ auction.startingBid }}</h3>
+        </div>
+        <div class="col-sm-12 col-md-3 d-flex flex-column align-items-end">
+            <h5>Current bid:</h5>
+            <h3>
+                {% if currentBid %}
+                ${{ currentBid.amount }}
+                <h6>by: {{ currentBid.bidder }}</h6>
+                {% else %}
+                $--.--
+                {% endif %}
+            </h3>
+        </div>
+        <div class="col-sm-12 col-md-5">
+            {% if not permission and user.is_authenticated and auction.active %}
+            <form action="{% url 'auctions:bid' auction.pk %}" method="post" class="d-flex justify-content-center g-3">
+                {% csrf_token %}
+                <div class="mb-3 mx-1">
+                    {{ placeBidForm.amount }}
+                </div>
+                <input class="btn btn-primary mb-3 mx-1" type="submit" value="Place Bid">
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-sm-12 col-md-7 mb-3">
+            <h3>Bid record:</h3>
+            <br>
+            <div class="list-group">
+                {% for bid in bids %}
+                {% if bid.current %}
+                <div class="list-group-item list-group-item active" aria-current="true">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">${{ bid.amount }}</h5>
+                        <small>On: {{ bid.datetime }}</small>
+                    </div>
+                    <p class="mb-1">By: {{ bid.bidder }}</p>
+                </div>
+                {% else %}
+                <div class="list-group-item list-group-item">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">${{ bid.amount }}</h5>
+                        <small>On: {{ bid.datetime }}</small>
+                    </div>
+                    <p class="mb-1">By: {{ bid.bidder }}</p>
+                </div>
+                {% endif %}
+                {% empty %}
+                <h5 class="mb-1">No bids yet.</h5>
+                {% endfor %}
+
+            </div>
+        </div>
+        <div class="col-sm-12 col-md-5 mb-3">
+            <h3>Comments:</h3>
+            <br>
+            <div class="list-group">
+                {% if user.is_authenticated and auction.active %}
+                <div class="list-group-item list-group-item">
+                    <div class="d-flex w-100 justify-content-between">
+                        <form action="{% url 'auctions:comment' auction.pk %}" method="post"
+                            class="row d-flex justify-content-end">
+                            {% csrf_token %}
+                            <div class="col-12 mb-3">
+                                {{ placeCommentForm.text }}
+                            </div>
+                            <div class="col d-flex justify-content-end">
+                                <input class="btn btn-primary" type="submit" value="Comment">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                {% endif %}
+                {% for comment in comments %}
+                <div class="list-group-item list-group-item">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ comment.author }}</h5>
+                        <small>On: {{ comment.datetime }}</small>
+                    </div>
+                    <p class="mb-1">{{ comment.text }}</p>
+                </div>
+                {% endfor %}
+
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
